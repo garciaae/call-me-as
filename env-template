@@ -1,0 +1,20 @@
+# Twilio account SID and auth token, get it from here: https://www.twilio.com/console
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+
+# Any number that belongs to the account SID in E.164 format
+TWILIO_NUMBER_FROM=+1...
+DEFAULT_NUMBER_TO=+1...
+
+
+# A valid Twilio Flow SID that can handle OB calls
+DEFAULT_CALL_FLOW_SID=FW54022a68761810b6080bbefcd1b5c669
+
+# A valid Twilio Flow SID that can handle OB calls pressing 1
+DEFAULT_PRESS_ONE_FLOW_SID=FW18be306a8da917547ee69d3bbb253049
+
+# The URL of the Twilio Function that will handle the conversation
+TWILIO_FUNCTION_URL=https://call-gpt-0000-dev.twil.io/prompt
+
+# Your customer.io ID or ngrok user name
+CUSTOMERIO_ID=...

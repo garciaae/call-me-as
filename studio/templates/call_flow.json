@@ -1,0 +1,214 @@
+{
+  "description": "default-call-flow",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "next": "call_user_1",
+          "event": "incomingRequest"
+        },
+        {
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "name": "call_user_1",
+      "type": "make-outgoing-call-v2",
+      "transitions": [
+        {
+          "next": "gather_prompt",
+          "event": "answered"
+        },
+        {
+          "event": "busy"
+        },
+        {
+          "event": "noAnswer"
+        },
+        {
+          "next": "say_error",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "machine_detection_speech_threshold": "2400",
+        "detect_answering_machine": false,
+        "send_digits": "",
+        "sip_auth_username": "",
+        "offset": {
+          "x": 130,
+          "y": 220
+        },
+        "recording_status_callback": "",
+        "sip_auth_password": "",
+        "recording_channels": "dual",
+        "timeout": 60,
+        "machine_detection": "Enable",
+        "trim": "do-not-trim",
+        "record": false,
+        "machine_detection_speech_end_threshold": "1200",
+        "machine_detection_timeout": "30",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "machine_detection_silence_timeout": "5000"
+      }
+    },
+    {
+      "name": "say_error",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Joanna",
+        "offset": {
+          "x": 520,
+          "y": 600
+        },
+        "loop": 1,
+        "say": "We couldn't connect the call. Goodbye.",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "http_prompt",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "say_play_1",
+          "event": "success"
+        },
+        {
+          "next": "say_application_error",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 340,
+          "y": 1330
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "add_twilio_auth": false,
+        "body": "{\n \"prompt\":\"{{widgets.gather_prompt.SpeechResult}} \"\n}",
+        "url": "https://call-gpt-0000-dev.twil.io/prompt"
+      }
+    },
+    {
+      "name": "say_play_1",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "gather_prompt",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Google.en-US-Neural2-J",
+        "offset": {
+          "x": -10,
+          "y": 1590
+        },
+        "loop": 1,
+        "say": "{{widgets.http_prompt.parsed.response}}",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "gather_prompt",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "say_thank_you",
+          "event": "keypress"
+        },
+        {
+          "next": "http_prompt",
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Google.en-US-Neural2-J",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 200,
+          "y": 990
+        },
+        "loop": 1,
+        "finish_on_key": "#",
+        "say": "<speak>\n<break time=\"8s\"/>\nHi\n</speak>",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en",
+        "profanity_filter": "true",
+        "timeout": 12
+      }
+    },
+    {
+      "name": "say_thank_you",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Google.en-US-Neural2-J",
+        "offset": {
+          "x": -410,
+          "y": 1440
+        },
+        "loop": 1,
+        "say": "<speak>\nThank you.\n</speak>",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "say_application_error",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Joanna",
+        "offset": {
+          "x": 450,
+          "y": 1630
+        },
+        "loop": 1,
+        "say": "<speak>\nAn application error has occurred. So long!\n</speak>",
+        "language": "en-US"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}

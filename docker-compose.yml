@@ -1,0 +1,27 @@
+services:
+  call-me-as:
+    container_name: call-me-as
+    platform: linux/x86_64
+    image: twilio/twilio-cli:latest
+    env_file:
+      - .env
+    volumes:
+      - call-me-as-profile:/profile
+      - ./entrypoint.sh:/usr/bin/entrypoint.sh
+    command: tail -f /dev/null
+  push-flow:
+    container_name: call-me-as-push-flow
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./push_flow.py:/push_flow.py
+      - ./studio:/studio
+    command: ["python", "/push_flow.py"]
+#    command: tail -f /dev/null
+
+volumes:
+    call-me-as-profile:
+      external: true
