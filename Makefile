@@ -25,10 +25,18 @@ bash:
 	@docker compose -f docker-compose.yml run --rm call-me-as bash
 
 call:
+ifdef prompt
+	@docker compose -f docker-compose.yml run --rm call-me-as twilio api:studio:v2:flows:executions:create --flow-sid $(CALL_FLOW_SID) --to $(to) --from $(TWILIO_NUMBER_FROM) --parameters '{"system_prompt":"$(prompt)"}'
+else
 	@docker compose -f docker-compose.yml run --rm call-me-as twilio api:studio:v2:flows:executions:create --flow-sid $(CALL_FLOW_SID) --to $(to) --from $(TWILIO_NUMBER_FROM)
+endif
 
 call-press-1:
+ifdef prompt
+	@docker compose -f docker-compose.yml run --rm call-me-as twilio api:studio:v2:flows:executions:create --flow-sid $(PRESS_1_FLOW_SID) --to $(to) --from $(TWILIO_NUMBER_FROM) --parameters '{"system_prompt":"$(prompt)"}'
+else
 	@docker compose -f docker-compose.yml run --rm call-me-as twilio api:studio:v2:flows:executions:create --flow-sid $(PRESS_1_FLOW_SID) --to $(to) --from $(TWILIO_NUMBER_FROM)
+endif
 
 push-flow:
 	@docker compose -f docker-compose.yml run --rm push-flow
