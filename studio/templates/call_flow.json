@@ -111,7 +111,7 @@
         "method": "POST",
         "content_type": "application/json;charset=utf-8",
         "add_twilio_auth": false,
-        "body": "{\n \"prompt\":\"{{widgets.gather_prompt.SpeechResult}}\",\n \"system_prompt\":\"{{flow.data.system_prompt}}\"\n}",
+        "body": "{\n \"prompt\":\"{{widgets.gather_prompt.SpeechResult}}\",\n \"system_prompt\":\"{{flow.data.system_prompt}}\",\n \"history\":\"{{widgets.http_prompt.parsed.history}}\"\n}",
         "url": "https://call-gpt-9889-dev.twil.io/prompt"
       }
     },
