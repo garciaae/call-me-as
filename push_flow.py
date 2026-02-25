@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Any
 
 from dotenv import load_dotenv
 from twilio.rest import Client
@@ -8,21 +9,21 @@ from twilio.rest.studio.v2.flow import FlowInstance
 # Load environment variables from .env file up 3 directories
 load_dotenv()
 
-account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-developer_name = os.getenv('CUSTOMERIO_ID')
-function_url = os.getenv('TWILIO_FUNCTION_URL')
+account_sid: str | None = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token: str | None = os.getenv('TWILIO_AUTH_TOKEN')
+developer_name: str | None = os.getenv('CUSTOMERIO_ID')
+function_url: str | None = os.getenv('TWILIO_FUNCTION_URL')
 
-templates_flows = zip(
+templates_flows: zip[tuple[str, str]] = zip(
     ('studio/templates/press_1_flow.json', 'studio/templates/call_flow.json'),
     ('press_1_flow', 'call_flow'),
 )
 
-client = Client(account_sid, auth_token)
+client: Client = Client(account_sid, auth_token)
 
 for flow_path, flow_suffix_name in templates_flows:
     with open(flow_path, 'r') as json_file:
-        flow_definition = json.load(json_file)
+        flow_definition: dict[str, Any] = json.load(json_file)
 
     for state in flow_definition.get('states', []):
         if state.get('name') == 'http_prompt' and state.get('type') == 'make-http-request':
@@ -30,10 +31,10 @@ for flow_path, flow_suffix_name in templates_flows:
             state['properties']['url'] = function_url
             break
 
-    flow_name = f'{developer_name if developer_name else "default"}_{flow_suffix_name}'
+    flow_name: str = f'{developer_name if developer_name else "default"}_{flow_suffix_name}'
 
     # Create a new flow in Twilio Studio using the JSON definition
-    new_flow = client.studio.v2.flows.create(
+    new_flow: FlowInstance = client.studio.v2.flows.create(
         friendly_name=flow_name,
         status=FlowInstance.Status.PUBLISHED,
         definition=flow_definition
